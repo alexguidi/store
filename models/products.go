@@ -39,6 +39,7 @@ func GetAllProducts() []Product {
 		if err != nil {
 			panic(err.Error())
 		}
+		p.ID = id
 		p.Name = name
 		p.Description = description
 		p.Price = price
@@ -61,4 +62,17 @@ func CreateNewProduct(name, description string, price float64, quantity int) {
 	}
 
 	insertProduct.Exec(name, description, price, quantity)
+}
+
+//DeleteProduct in db
+func DeleteProduct(id string) {
+	db := db.ConnectWithPostgres()
+	defer db.Close()
+	deleteProduct, err := db.Prepare("DELETE FROM products WHERE id=$1")
+
+	if err != nil {
+		panic(err.Error())
+	}
+
+	deleteProduct.Exec(id)
 }
