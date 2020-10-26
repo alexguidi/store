@@ -20,7 +20,7 @@ func GetAllProducts() []Product {
 	db := db.ConnectWithPostgres()
 	defer db.Close()
 
-	selectAll, err := db.Query("SELECT * FROM products")
+	selectAll, err := db.Query("SELECT * FROM products ORDER BY id asc")
 
 	if err != nil {
 		fmt.Println("index")
@@ -75,4 +75,48 @@ func DeleteProduct(id string) {
 	}
 
 	deleteProduct.Exec(id)
+}
+
+//Edit a product
+func EditProduct(id string) Product {
+	db := db.ConnectWithPostgres()
+	defer db.Close()
+	productFromDb, err := db.Query("SELECT * FROM products where id = $1", id)
+
+	if err != nil {
+		panic(err.Error())
+	}
+
+	productToUpdate := Product{}
+
+	for productFromDb.Next() {
+		var id, quantity int
+		var name, description string
+		var price float64
+
+		err = productFromDb.Scan(&id, &name, &description, &price, &quantity)
+		if err != nil {
+			panic(err.Error())
+		}
+
+		productToUpdate.ID = id
+		productToUpdate.Name = name
+		productToUpdate.Description = description
+		productToUpdate.Price = price
+		productToUpdate.Quantity = quantity
+	}
+	return productToUpdate
+}
+
+//Update a product in db
+func UpdateProduct(id int, name, description string, price float64, quantity int) {
+	db := db.ConnectWithPostgres()
+	defer db.Close()
+
+	UpdateProduct, err := db.Prepare("UPDATE products SET name = $1, description = $2, price = $3, quantity = $4 WHERE id = $5")
+	if err != nil {
+		panic(err.Error())
+	}
+
+	UpdateProduct.Exec(name, description, price, quantity, id)
 }
