@@ -77,7 +77,7 @@ func DeleteProduct(id string) {
 	deleteProduct.Exec(id)
 }
 
-//Edit a product
+//EditProduct a product
 func EditProduct(id string) Product {
 	db := db.ConnectWithPostgres()
 	defer db.Close()
@@ -108,7 +108,7 @@ func EditProduct(id string) Product {
 	return productToUpdate
 }
 
-//Update a product in db
+//UpdateProduct a product in db
 func UpdateProduct(id int, name, description string, price float64, quantity int) {
 	db := db.ConnectWithPostgres()
 	defer db.Close()
